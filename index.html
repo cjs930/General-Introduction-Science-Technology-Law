@@ -133,31 +133,51 @@
         padding: 0;
       }
 
-      .tree-item {
+      .tree-node {
+        margin: 0;
+        padding: 0;
+      }
+
+      .tree-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
+        min-height: 46px;
         padding: 10px 0;
         border-bottom: 1px solid var(--border);
         line-height: 1.5;
       }
 
-      .tree-item:last-child {
+      .tree-row:last-child {
         border-bottom: none;
       }
 
-      .tree-name {
+      .tree-node > .tree-row {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.75);
+      }
+
+      .tree-label {
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        min-width: 0;
         color: var(--text);
         font-weight: 600;
       }
 
-      .tree-name:hover {
+      .tree-label:hover {
         color: var(--primary);
         text-decoration: none;
+      }
+
+      .tree-label span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .tree-actions {
@@ -168,14 +188,49 @@
         font-size: 0.9rem;
       }
 
-      .tree-actions a {
+      .tree-actions a,
+      .tree-toggle {
         color: var(--primary);
-        white-space: nowrap;
+        background: transparent;
+        border: 1px solid rgba(37, 99, 235, 0.35);
+        border-radius: 8px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font: inherit;
+      }
+
+      .tree-toggle {
+        min-width: 68px;
+      }
+
+      .tree-actions a {
+        text-decoration: none;
+      }
+
+      .tree-actions a:hover,
+      .tree-toggle:hover {
+        text-decoration: none;
+        background: var(--primary-soft);
       }
 
       .tree-type {
         color: var(--muted);
         font-size: 0.8rem;
+        white-space: nowrap;
+      }
+
+      .tree-children {
+        list-style: none;
+        margin: 0;
+        padding: 0 0 0 18px;
+      }
+
+      .tree-node.is-collapsed > .tree-children {
+        display: none;
+      }
+
+      .tree-node.is-collapsed > .tree-row .tree-toggle {
+        background: #f8fafc;
       }
 
       .readme-content {
@@ -345,49 +400,129 @@
           });
         }
 
-        function createTreeItem(item) {
+        function buildTreeMap(items) {
+          const map = new Map();
+          const roots = [];
+
+          items.forEach((item) => {
+            const path = item.path;
+            const name = path.split('/').pop();
+            const parentPath = path.includes('/') ? path.split('/').slice(0, -1).join('/') : '';
+            const node = {
+              ...item,
+              name,
+              parentPath,
+              children: []
+            };
+            map.set(path, node);
+
+            if (!parentPath) {
+              roots.push(node);
+            }
+          });
+
+          items.forEach((item) => {
+            const parentPath = item.path.includes('/') ? item.path.split('/').slice(0, -1).join('/') : '';
+            if (parentPath && map.has(parentPath)) {
+              const parent = map.get(parentPath);
+              if (parent) {
+                parent.children.push(map.get(item.path));
+              }
+            }
+          });
+
+          roots.sort((a, b) => {
+            const aType = a.type === 'tree' ? 0 : 1;
+            const bType = b.type === 'tree' ? 0 : 1;
+            if (aType !== bType) return aType - bType;
+            return a.name.localeCompare(b.name, 'zh-Hant');
+          });
+
+          roots.forEach((root) => {
+            root.children.sort((a, b) => {
+              const aType = a.type === 'tree' ? 0 : 1;
+              const bType = b.type === 'tree' ? 0 : 1;
+              if (aType !== bType) return aType - bType;
+              return a.name.localeCompare(b.name, 'zh-Hant');
+            });
+          });
+
+          return roots;
+        }
+
+        function createTreeItem(node, depth = 0) {
           const li = document.createElement('li');
-          li.className = 'tree-item';
+          li.className = 'tree-node';
 
-          const isDir = item.type === 'tree';
-          const displayName = isDir ? item.path.split('/').pop() + '/' : item.path.split('/').pop();
-          const openUrl = isDir
-            ? `https://github.com/${owner}/${repo}/tree/${branch}/${encodeURI(item.path)}`
-            : `${siteRoot}${encodeURI(item.path)}`;
-          const githubUrl = `https://github.com/${owner}/${repo}/blob/${branch}/${encodeURI(item.path)}`;
+          const isDir = node.type === 'tree';
+          const hasChildren = node.children && node.children.length > 0;
+          const collapsed = true;
+          li.classList.toggle('is-collapsed', collapsed && hasChildren);
 
-          const nameLink = document.createElement('a');
-          nameLink.href = openUrl;
-          nameLink.target = '_blank';
-          nameLink.rel = 'noopener noreferrer';
-          nameLink.className = 'tree-name';
-          nameLink.innerHTML = `${isDir ? '📁' : '📄'} <span>${displayName}</span>`;
+          const row = document.createElement('div');
+          row.className = 'tree-row';
+
+          const label = document.createElement('a');
+          label.className = 'tree-label';
+          label.href = isDir
+            ? `https://github.com/${owner}/${repo}/tree/${branch}/${encodeURI(node.path)}`
+            : `${siteRoot}${encodeURI(node.path)}`;
+          label.target = '_blank';
+          label.rel = 'noopener noreferrer';
+          label.innerHTML = `${isDir ? '📁' : '📄'} <span>${node.name}${isDir ? '/' : ''}</span>`;
 
           const actions = document.createElement('div');
           actions.className = 'tree-actions';
 
-          const openLink = document.createElement('a');
-          openLink.href = openUrl;
-          openLink.target = '_blank';
-          openLink.rel = 'noopener noreferrer';
-          openLink.textContent = isDir ? '展開' : '在新分頁開啟';
+          if (isDir && hasChildren) {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.type = 'button';
+            toggleBtn.className = 'tree-toggle';
+            toggleBtn.textContent = '展開';
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            toggleBtn.addEventListener('click', () => {
+              const isCollapsed = li.classList.toggle('is-collapsed');
+              toggleBtn.textContent = isCollapsed ? '展開' : '收合';
+              toggleBtn.setAttribute('aria-expanded', String(!isCollapsed));
+            });
+            actions.appendChild(toggleBtn);
+          }
+
+          if (!isDir) {
+            const openLink = document.createElement('a');
+            openLink.href = `${siteRoot}${encodeURI(node.path)}`;
+            openLink.target = '_blank';
+            openLink.rel = 'noopener noreferrer';
+            openLink.textContent = '在新分頁開啟';
+            actions.appendChild(openLink);
+          }
 
           const githubLink = document.createElement('a');
-          githubLink.href = githubUrl;
+          githubLink.href = isDir
+            ? `https://github.com/${owner}/${repo}/tree/${branch}/${encodeURI(node.path)}`
+            : `https://github.com/${owner}/${repo}/blob/${branch}/${encodeURI(node.path)}`;
           githubLink.target = '_blank';
           githubLink.rel = 'noopener noreferrer';
           githubLink.textContent = 'GitHub';
-
-          actions.appendChild(openLink);
           actions.appendChild(githubLink);
 
           const type = document.createElement('span');
           type.className = 'tree-type';
           type.textContent = isDir ? '資料夾' : '檔案';
 
-          li.appendChild(nameLink);
-          li.appendChild(actions);
-          li.appendChild(type);
+          row.appendChild(label);
+          row.appendChild(actions);
+          row.appendChild(type);
+          li.appendChild(row);
+
+          if (isDir && hasChildren) {
+            const childList = document.createElement('ul');
+            childList.className = 'tree-children';
+            node.children.forEach((child) => {
+              childList.appendChild(createTreeItem(child, depth + 1));
+            });
+            li.appendChild(childList);
+          }
 
           return li;
         }
@@ -408,9 +543,9 @@
               return;
             }
 
-            items.forEach((item) => {
-              if (item.path === 'README.md') return;
-              treeEl.appendChild(createTreeItem(item));
+            const roots = buildTreeMap(items);
+            roots.forEach((root) => {
+              treeEl.appendChild(createTreeItem(root));
             });
           } catch (error) {
             console.error(error);
