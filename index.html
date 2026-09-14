@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>General-Introduction-Science-Technology-Law</title>
+    <meta
+      name="description"
+      content="科技法規總論課程網站，動態列出 GitHub 倉庫目錄與 README 內容。"
+    />
+    <style>
+      :root {
+        --bg: #0f172a;
+        --bg-soft: #111827;
+        --panel: #ffffff;
+        --panel-alt: #f8fafc;
+        --text: #0f172a;
+        --muted: #475569;
+        --border: #e2e8f0;
+        --primary: #2563eb;
+        --primary-soft: rgba(37, 99, 235, 0.08);
+        --success: #0f766e;
+        --shadow: 0 20px 40px rgba(15, 23, 42, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        color: var(--text);
+      }
+
+      a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .site-header {
+        background: linear-gradient(120deg, #0f172a 0%, #1e293b 100%);
+        color: white;
+        box-shadow: var(--shadow);
+      }
+
+      .site-header-inner,
+      .container {
+        width: min(1200px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .site-header-inner {
+        padding: 28px 0 18px;
+      }
+
+      .site-title {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 2.8rem);
+        line-height: 1.2;
+      }
+
+      .subtitle {
+        margin-top: 10px;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 0.98rem;
+      }
+
+      .main {
+        padding: 32px 0 60px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+      }
+
+      .panel + .panel {
+        margin-top: 24px;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 22px;
+        background: var(--panel-alt);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .panel-title {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+
+      .tiny-badge {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .panel-body {
+        padding: 24px 22px 22px;
+      }
+
+      .tree {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .tree-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 52px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+        transition: 0.2s ease;
+      }
+
+      .tree-item:hover {
+        border-color: rgba(37, 99, 235, 0.35);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 18px rgba(37, 99, 235, 0.08);
+      }
+
+      .tree-name {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .tree-name strong {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .tree-tag {
+        flex-shrink: 0;
+        font-size: 0.72rem;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-weight: 700;
+      }
+
+      .tree-tag.dir {
+        background: rgba(15, 118, 110, 0.12);
+        color: var(--success);
+      }
+
+      .tree-tag.file {
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--primary);
+      }
+
+      .readme-content {
+        line-height: 1.8;
+        color: var(--text);
+      }
+
+      .readme-content h1,
+      .readme-content h2,
+      .readme-content h3,
+      .readme-content h4 {
+        margin-top: 1.5em;
+        margin-bottom: 0.6em;
+        line-height: 1.35;
+      }
+
+      .readme-content h1 {
+        font-size: clamp(1.8rem, 2.2vw, 2.5rem);
+        padding-bottom: 0.4em;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .readme-content h2 {
+        font-size: 1.4rem;
+      }
+
+      .readme-content p,
+      .readme-content li {
+        color: #1e293b;
+      }
+
+      .readme-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        overflow: hidden;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+      }
+
+      .readme-content th,
+      .readme-content td {
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .readme-content th {
+        background: #f8fafc;
+      }
+
+      .readme-content code {
+        background: #f1f5f9;
+        border-radius: 6px;
+        padding: 0.2em 0.45em;
+        font-family: "Consolas", "Courier New", monospace;
+      }
+
+      .readme-content pre {
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        overflow-x: auto;
+      }
+
+      .readme-content blockquote {
+        margin: 1rem 0;
+        padding: 0.8rem 1rem;
+        border-left: 4px solid var(--primary);
+        background: var(--primary-soft);
+        border-radius: 0 10px 10px 0;
+      }
+
+      .readme-content ul,
+      .readme-content ol {
+        padding-left: 1.5rem;
+      }
+
+      .readme-content a {
+        color: var(--primary);
+      }
+
+      .empty-state {
+        color: var(--muted);
+        padding: 14px 0;
+      }
+
+      @media (max-width: 640px) {
+        .panel-header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .tree {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <h1 class="site-title">General-Introduction-Science-Technology-Law</h1>
+        <div class="subtitle">
+          科技法規總論（一）｜GitHub Pages 自動更新站台
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="container">
+        <section class="panel" aria-labelledby="directory-title">
+          <div class="panel-header">
+            <h2 id="directory-title" class="panel-title">網站目錄與檔案</h2>
+            <span class="tiny-badge">自動讀取 GitHub</span>
+          </div>
+          <div class="panel-body">
+            <ul id="repoTree" class="tree" aria-live="polite"></ul>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="readme-title">
+          <div class="panel-header">
+            <h2 id="readme-title" class="panel-title">README.md</h2>
+            <a class="tiny-badge" href="https://github.com/cjs930/General-Introduction-Science-Technology-Law" target="_blank" rel="noopener">開啟 GitHub</a>
+          </div>
+          <div class="panel-body">
+            <article id="readmeContent" class="readme-content">載入中...</article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      (function () {
+        const owner = 'cjs930';
+        const repo = 'General-Introduction-Science-Technology-Law';
+        const branch = 'main';
+        const siteRoot = 'https://cjs930.github.io/General-Introduction-Science-Technology-Law/';
+        const treeEl = document.getElementById('repoTree');
+        const readmeEl = document.getElementById('readmeContent');
+
+        function normalizeTree(items) {
+          const validItems = (items || []).filter((item) => {
+            if (!item || !item.path) return false;
+            if (item.path === '.gitignore') return false;
+            if (item.path.startsWith('.git')) return false;
+            if (item.path.startsWith('.github')) return false;
+            return true;
+          });
+
+          return validItems.sort((a, b) => {
+            const aKind = a.type === 'tree' ? 0 : 1;
+            const bKind = b.type === 'tree' ? 0 : 1;
+            if (aKind !== bKind) return aKind - bKind;
+            return a.path.localeCompare(b.path, 'zh-Hant');
+          });
+        }
+
+        function createTreeItem(item) {
+          const li = document.createElement('li');
+          li.className = 'tree-item';
+
+          const isDir = item.type === 'tree';
+          const name = isDir ? item.path.split('/').pop() + '/' : item.path.split('/').pop();
+          const label = isDir ? '目錄' : '檔案';
+
+          const link = document.createElement('a');
+          link.href = isDir
+            ? `https://github.com/${owner}/${repo}/tree/${branch}/${encodeURI(item.path)}`
+            : `${siteRoot}${encodeURI(item.path)}`;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.className = 'tree-name';
+
+          const icon = document.createElement('span');
+          icon.textContent = isDir ? '📁' : '📄';
+
+          const text = document.createElement('strong');
+          text.textContent = name;
+
+          const tag = document.createElement('span');
+          tag.className = 'tree-tag ' + (isDir ? 'dir' : 'file');
+          tag.textContent = label;
+
+          link.appendChild(icon);
+          link.appendChild(text);
+          li.appendChild(link);
+          li.appendChild(tag);
+
+          return li;
+        }
+
+        async function loadTree() {
+          try {
+            const repoMetaRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+            if (!repoMetaRes.ok) throw new Error('Repository metadata request failed');
+            const repoMeta = await repoMetaRes.json();
+            const defaultBranch = repoMeta.default_branch || branch;
+            const treeRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${defaultBranch}?recursive=1`);
+            if (!treeRes.ok) throw new Error('GitHub tree request failed');
+            const treeData = await treeRes.json();
+            const items = normalizeTree(treeData.tree || []);
+
+            if (!items.length) {
+              treeEl.innerHTML = '<li class="empty-state">目前沒有可顯示的檔案。</li>';
+              return;
+            }
+
+            items.forEach((item) => {
+              if (item.path === 'README.md') return;
+              treeEl.appendChild(createTreeItem(item));
+            });
+          } catch (error) {
+            console.error(error);
+            treeEl.innerHTML = '<li class="empty-state">無法載入目錄資料，請稍後再試。</li>';
+          }
+        }
+
+        async function loadReadme() {
+          try {
+            const repoMetaRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+            if (!repoMetaRes.ok) throw new Error('Repository metadata request failed');
+            const repoMeta = await repoMetaRes.json();
+            const currentBranch = repoMeta.default_branch || branch;
+            const readmeUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${currentBranch}/README.md`;
+            const readmeRes = await fetch(readmeUrl);
+
+            if (!readmeRes.ok) {
+              throw new Error('README fetch failed');
+            }
+
+            const markdown = await readmeRes.text();
+            if (window.marked && typeof window.marked.parse === 'function') {
+              readmeEl.innerHTML = window.marked.parse(markdown);
+            } else {
+              readmeEl.textContent = markdown;
+            }
+          } catch (error) {
+            console.error(error);
+            readmeEl.innerHTML = '<p>無法載入 README.md 內容，請稍後再試。</p>';
+          }
+        }
+
+        loadTree();
+        loadReadme();
+      })();
+    </script>
+  </body>
+</html>
