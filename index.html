@@ -79,6 +79,13 @@
         padding: 32px 0 60px;
       }
 
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
+        gap: 24px;
+        align-items: start;
+      }
+
       .panel {
         background: var(--panel);
         border: 1px solid var(--border);
@@ -88,7 +95,7 @@
       }
 
       .panel + .panel {
-        margin-top: 24px;
+        margin-top: 0;
       }
 
       .panel-header {
@@ -121,12 +128,9 @@
       }
 
       .tree {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 12px;
+        list-style: none;
         margin: 0;
         padding: 0;
-        list-style: none;
       }
 
       .tree-item {
@@ -134,51 +138,44 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        min-height: 52px;
-        padding: 12px 14px;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: #fff;
-        transition: 0.2s ease;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        line-height: 1.5;
       }
 
-      .tree-item:hover {
-        border-color: rgba(37, 99, 235, 0.35);
-        transform: translateY(-1px);
-        box-shadow: 0 10px 18px rgba(37, 99, 235, 0.08);
+      .tree-item:last-child {
+        border-bottom: none;
       }
 
       .tree-name {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        min-width: 0;
-        overflow: hidden;
+        color: var(--text);
+        font-weight: 600;
       }
 
-      .tree-name strong {
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .tree-tag {
-        flex-shrink: 0;
-        font-size: 0.72rem;
-        padding: 4px 8px;
-        border-radius: 999px;
-        font-weight: 700;
-      }
-
-      .tree-tag.dir {
-        background: rgba(15, 118, 110, 0.12);
-        color: var(--success);
-      }
-
-      .tree-tag.file {
-        background: rgba(37, 99, 235, 0.08);
+      .tree-name:hover {
         color: var(--primary);
+        text-decoration: none;
+      }
+
+      .tree-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        font-size: 0.9rem;
+      }
+
+      .tree-actions a {
+        color: var(--primary);
+        white-space: nowrap;
+      }
+
+      .tree-type {
+        color: var(--muted);
+        font-size: 0.8rem;
       }
 
       .readme-content {
@@ -268,14 +265,21 @@
         padding: 14px 0;
       }
 
+      @media (max-width: 650px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
       @media (max-width: 640px) {
         .panel-header {
           align-items: flex-start;
           flex-direction: column;
         }
 
-        .tree {
-          grid-template-columns: 1fr;
+        .tree-item {
+          flex-direction: column;
+          align-items: flex-start;
         }
       }
     </style>
@@ -285,13 +289,13 @@
       <div class="site-header-inner">
         <h1 class="site-title">General-Introduction-Science-Technology-Law</h1>
         <div class="subtitle">
-          科技法規總論（一）｜GitHub Pages 自動更新站台
+          GitHub Pages: <a href="https://cjs930.github.io/General-Introduction-Science-Technology-Law/" target="_blank" rel="noopener" style="color: #fff; text-decoration: underline;">cjs930.github.io/General-Introduction-Science-Technology-Law</a> ｜ branch: main
         </div>
       </div>
     </header>
 
     <main class="main">
-      <div class="container">
+      <div class="container layout">
         <section class="panel" aria-labelledby="directory-title">
           <div class="panel-header">
             <h2 id="directory-title" class="panel-title">網站目錄與檔案</h2>
@@ -346,31 +350,44 @@
           li.className = 'tree-item';
 
           const isDir = item.type === 'tree';
-          const name = isDir ? item.path.split('/').pop() + '/' : item.path.split('/').pop();
-          const label = isDir ? '目錄' : '檔案';
-
-          const link = document.createElement('a');
-          link.href = isDir
+          const displayName = isDir ? item.path.split('/').pop() + '/' : item.path.split('/').pop();
+          const openUrl = isDir
             ? `https://github.com/${owner}/${repo}/tree/${branch}/${encodeURI(item.path)}`
             : `${siteRoot}${encodeURI(item.path)}`;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          link.className = 'tree-name';
+          const githubUrl = `https://github.com/${owner}/${repo}/blob/${branch}/${encodeURI(item.path)}`;
 
-          const icon = document.createElement('span');
-          icon.textContent = isDir ? '📁' : '📄';
+          const nameLink = document.createElement('a');
+          nameLink.href = openUrl;
+          nameLink.target = '_blank';
+          nameLink.rel = 'noopener noreferrer';
+          nameLink.className = 'tree-name';
+          nameLink.innerHTML = `${isDir ? '📁' : '📄'} <span>${displayName}</span>`;
 
-          const text = document.createElement('strong');
-          text.textContent = name;
+          const actions = document.createElement('div');
+          actions.className = 'tree-actions';
 
-          const tag = document.createElement('span');
-          tag.className = 'tree-tag ' + (isDir ? 'dir' : 'file');
-          tag.textContent = label;
+          const openLink = document.createElement('a');
+          openLink.href = openUrl;
+          openLink.target = '_blank';
+          openLink.rel = 'noopener noreferrer';
+          openLink.textContent = isDir ? '展開' : '在新分頁開啟';
 
-          link.appendChild(icon);
-          link.appendChild(text);
-          li.appendChild(link);
-          li.appendChild(tag);
+          const githubLink = document.createElement('a');
+          githubLink.href = githubUrl;
+          githubLink.target = '_blank';
+          githubLink.rel = 'noopener noreferrer';
+          githubLink.textContent = 'GitHub';
+
+          actions.appendChild(openLink);
+          actions.appendChild(githubLink);
+
+          const type = document.createElement('span');
+          type.className = 'tree-type';
+          type.textContent = isDir ? '資料夾' : '檔案';
+
+          li.appendChild(nameLink);
+          li.appendChild(actions);
+          li.appendChild(type);
 
           return li;
         }
